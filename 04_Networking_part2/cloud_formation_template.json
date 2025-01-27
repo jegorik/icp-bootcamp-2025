@@ -1,0 +1,123 @@
+Resources:
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: 'Name'
+          Value: 'MyVPC'
+
+  MySubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: 'eu-central-1a'
+
+  MySubnetB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: '10.0.2.0/24'
+      AvailabilityZone: 'eu-central-1b'
+
+  MySubnetC:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: '10.0.3.0/24'
+      AvailabilityZone: 'eu-central-1c'
+
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: 'Name'
+          Value: 'MyRouteTable'
+
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
+  MyRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref MyInternetGateway
+
+  SubnetARouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetA
+      RouteTableId: !Ref MyRouteTable
+
+  SubnetBRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetB
+      RouteTableId: !Ref MyRouteTable
+
+  SubnetCRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetC
+      RouteTableId: !Ref MyRouteTable
+
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupDescription: 'My Security Group'
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '10.0.0.0/16'  # Adjust as necessary
+      Tags:
+        - Key: 'Name'
+          Value: 'MySecurityGroup'
+
+  EC2InstanceA:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: 't2.micro'  # Change as needed
+      ImageId: 'ami-0c55b159cbfafe1f0'  # Replace with a valid AMI ID for your region
+      SubnetId: !Ref MySubnetA
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: 'Name'
+          Value: 'InstanceA'
+
+  EC2InstanceB:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: 't2.micro'  # Change as needed
+      ImageId: 'ami-0c55b159cbfafe1f0'  # Replace with a valid AMI ID for your region
+      SubnetId: !Ref MySubnetB
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: 'Name'
+          Value: 'InstanceB'
+
+  EC2InstanceC:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: 't2.micro'  # Change as needed
+      ImageId: 'ami-0c55b159cbfafe1f0'  # Replace with a valid AMI ID for your region
+      SubnetId: !Ref MySubnetC
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: 'Name'
+          Value: 'InstanceC'
